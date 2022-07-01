@@ -269,6 +269,9 @@ async function printRecommendedDepsInstallationInstructions(
 }
 
 async function writeEmptyHardhatConfig() {
+  if (await fsExtra.pathExists("hardhat.config.js")) {
+    return;
+  }
   return fsExtra.writeFile(
     "hardhat.config.js",
     `/**
@@ -331,7 +334,10 @@ async function getAction(): Promise<Action> {
   }
 }
 
-async function createPackageJson() {
+async function writeEmptyPackageJson() {
+  if (await fsExtra.pathExists("package.json")) {
+    return;
+  }
   await fsExtra.writeJson(
     "package.json",
     {
@@ -352,12 +358,10 @@ export async function createProject() {
     return;
   }
 
-  if (!(await fsExtra.pathExists("package.json"))) {
-    await createPackageJson();
-  }
-
   if (action === Action.CREATE_EMPTY_HARDHAT_CONFIG_ACTION) {
     await writeEmptyHardhatConfig();
+    await writeEmptyPackageJson();
+
     console.log(
       `${emoji("✨ ")}${chalk.cyan(`Config file created`)}${emoji(" ✨")}`
     );
